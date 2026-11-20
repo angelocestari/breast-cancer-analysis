@@ -82,45 +82,71 @@ estatisticas_descritivas <- dados_longos |>
 
 #4. Comparação visual entre os diagnósticos
 
-grafico_radius <- dados_longos |> 
-  dplyr::filter(caracteristica=="radius") |>
-  ggplot(
-    aes(
-      x=diagnosis,
-      y=valor,
-      fill=diagnosis
+#Função para criar o boxplot e salvar
+
+grafico_caracteristica <- function(nome_caracteristica, salvar = FALSE) {
+  
+  grafico <- dados_longos |>
+    dplyr::filter(caracteristica == nome_caracteristica) |>
+    ggplot(
+      aes(
+        x = diagnosis,
+        y = valor,
+        fill = diagnosis
+      )
+    ) +
+    geom_boxplot() +
+    facet_wrap(
+      ~ tipo,
+      scales = "free_y"
+    ) +
+    scale_fill_manual(
+      values = c(
+        "B" = "#4DAF4A",
+        "M" = "#E41A1C"
+      ),
+      labels = c(
+        "B" = "Benigno",
+        "M" = "Maligno"
+      )
+    ) +
+    labs(
+      x = "Diagnóstico",
+      y = "Valor",
+      title = paste(
+        "Distribuição de",
+        nome_caracteristica,
+        "por diagnóstico"
+      ),
+      fill = "Diagnóstico"
     )
-  ) +
-  geom_boxplot() +
-  facet_wrap(
-    ~ tipo,
-    scales = "free_y"
-  ) +
-  scale_fill_manual(
-    values = c(
-      "B" = "#4DAF4A",
-      "M" = "#E41A1C"
-    ),
-    labels = c(
-      "B" = "Benigno",
-      "M" = "Maligno"
+  
+  if (salvar) {
+    ggsave(
+      filename = paste0(
+        "results/figures/distribuicao_",
+        nome_caracteristica,
+        "_diagnostico.png"
+      ),
+      plot = grafico,
+      width = 8,
+      height = 5,
+      dpi = 300
     )
-  ) +
-  labs(
-    x="Diagnóstico",
-    y="Valor",
-    title = "Distribuição do raio por diagnóstico",
-    fill = "Diagnóstico"
-  )
+  }
+  
+  return(grafico)
+}
 
-ggsave(
-  filename = "results/figures/distribuicao_radius_diagnostico.png",
-  plot = grafico_radius,
-  width = 8,
-  height = 5,
-  dpi = 300
-)
+unique(dados_longos$caracteristica)
 
-
-
-
+grafico_caracteristica("radius", salvar = TRUE)
+grafico_caracteristica("texture", salvar = TRUE)
+grafico_caracteristica("perimeter", salvar = TRUE)
+grafico_caracteristica("area", salvar = TRUE)
+grafico_caracteristica("smoothness", salvar = TRUE)
+grafico_caracteristica("compactness", salvar = TRUE)
+grafico_caracteristica("concavity", salvar = TRUE)
+grafico_caracteristica("concave_points", salvar = TRUE)
+grafico_caracteristica("symmetry", salvar = TRUE)
+grafico_caracteristica("fractal_dimension", salvar = TRUE)
