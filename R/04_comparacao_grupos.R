@@ -148,4 +148,68 @@ tabela_normalidade <- dplyr::bind_rows(
     )
   )
 
+tabela_testes <- tabela_normalidade |>
+  dplyr::group_by(variavel) |>
+  dplyr::summarise(
+    normalidade_b = dplyr::if_else(
+      p_shapiro[diagnosis == "B"] > 0.05,
+      "Não rejeita",
+      "Rejeita"
+    ),
+    
+    normalidade_m = dplyr::if_else(
+      p_shapiro[diagnosis == "M"] > 0.05,
+      "Não rejeita",
+      "Rejeita"
+    ),
+    
+    teste_sugerido = dplyr::if_else(
+      all(p_shapiro > 0.05),
+      "Welch",
+      "Mann-Whitney"
+    ),
+    
+    .groups = "drop"
+  )
+
+
+resultados_mann_whitney <- lapply(
+  variaveis,
+  function(variavel){
+    
+    teste <- wilcox.test(
+      dados_modelo[[variavel]] ~ dados_modelo$diagnosis,
+      exact = FALSE
+    )
+    
+    data.frame(
+      variavel = variavel,
+      p_value = teste$p.value
+    )
+  }
+)
+
+tabela_mann_whitney <- dplyr::bind_rows(
+  resultados_mann_whitney
+)
+
+tabela_mann_whitney <- tabela_mann_whitney |>
+  dplyr::mutate(
+    p_bonferroni = p.adjust(
+      p_value,
+      method = "bonferroni"
+    ),
+    significativo = dplyr::if_else(
+      p_bonferroni < 0.05,
+      "Sim",
+      "Não"
+    )
+  )
+
+
+
+
+
+
+
 
