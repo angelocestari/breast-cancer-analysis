@@ -1,4 +1,5 @@
 library(dplyr)
+library(pROC)
 
 modelo_final <- readRDS(
   "results/modelo_logistico_final.rds"
@@ -141,4 +142,53 @@ avaliacao$FP
 avaliacao$FN
 avaliacao$metricas
 
+roc_modelo <- roc(
+  response = resultados_teste$diagnosis,
+  predictor = resultados_teste$probabilidade_maligno,
+  levels = c("B", "M"),
+  direction = "<"
+)
+
+auc_modelo <- auc(roc_modelo)
+
+auc_modelo
+
+plot(
+  roc_modelo,
+  main="Curva ROC - Modelo Logístico Final",
+  print.auc = TRUE
+)
+
+pasta_avaliacao <- file.path(
+  "results",
+  "figures",
+  "avaliacao_modelo"
+)
+
+if(!dir.exists(pasta_avaliacao)){
+  dir.create(
+    pasta_avaliacao,
+    recursive = TRUE
+  )
+}
+
+png(
+  filename = file.path(
+    pasta_avaliacao,
+    "curva_roc_modelo_final.png"
+  ),
+  width = 2400,
+  height = 1800,
+  res = 300
+)
+
+plot(
+  roc_modelo,
+  main = "Curva ROC - Modelo Logístico Final",
+  print.auc = TRUE
+)
+
+dev.off()
+
+auc_modelo
 
