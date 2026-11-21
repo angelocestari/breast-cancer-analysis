@@ -1,5 +1,6 @@
 library(rsample)
 library(caret)
+library(car)
 
 dados_modelo <- readRDS(
   "data/processed/breast_cancer_processed.rds"
@@ -92,6 +93,8 @@ variaveis_remover_correlacao <- findCorrelation(
   exact = TRUE
 )
 
+variaveis_remover_correlacao # variáveis que foram redundantes
+
 dados_treino_reduzido <- dados_treino |>
   dplyr::select(
     -dplyr::all_of(variaveis_remover_correlacao)
@@ -107,9 +110,96 @@ modelo_reduzido <- glm( # CONVERGIU!!!!!!
   family = binomial()
 )
   
+vif_modelo <- vif(modelo_reduzido)
+
+vif_modelo
+
+# -----------------------------------------------------
+# Baseado no VIF, removerei caractéristicas aos poucos
+# -----------------------------------------------------
+
+dados_treino_vif <- dados_treino_reduzido |>
+  dplyr::select(-fractal_dimension_worst)
+
+modelo_vif <- glm(
+  diagnosis ~ .,
+  data = dados_treino_vif,
+  family = binomial()
+)
+
+car::vif(modelo_vif) # verifica multicolinearidade agora
+
+dados_treino_vif_2 <- dados_treino_vif |> 
+  dplyr::select(-compactness_se)
+
+modelo_vif_2 <- glm(
+  diagnosis ~ .,
+  data = dados_treino_vif_2,
+  family = binomial()
+)
+
+vif_modelo_2 <- car::vif(modelo_vif_2)
+
+sort(
+  vif_modelo_2,
+  decreasing = TRUE
+)
+
+dados_treino_vif_3 <- dados_treino_vif_2 |>
+  dplyr::select(-smoothness_mean)
+
+modelo_vif_3 <- glm(
+  diagnosis ~ .,
+  data = dados_treino_vif_3,
+  family = binomial()
+)  
+
+vif_modelo_3 <- car::vif(modelo_vif_3)
+sort(
+  vif_modelo_3,
+  decreasing = TRUE
+)
+
+dados_treino_vif_4 <- dados_treino_vif_3 |>
+  dplyr::select(-fractal_dimension_se)
+
+modelo_vif_4 <- glm(
+  diagnosis ~ .,
+  data = dados_treino_vif_4,
+  family = binomial()
+)  
+
+vif_modelo_4 <- car::vif(modelo_vif_4)
+sort(
+  vif_modelo_4,
+  decreasing = TRUE
+)
+
+# -----------------------------------------------------------
+# A partir daqui, multicolinearidade não é mais um problema
+# Temos VIF < 5 para todas as características restantes
+# -----------------------------------------------------------
+
+range(
+  fitted(modelo_vif_4)
+)
+
+summary(modelo_vif_4)
+
+dados_treino_padronizado <- dados_treino_vif_4
+
+dados_treino_padronizado <- dados_treino_padronizado |>
+  dplyr::mutate(
+    dplyr::across(
+      -diagnosis,
+      scale
+    )
+  )
+
+modelo_padronizado <- glm(
+  diagnosis ~ .,
+  data = dados_treino_padronizado,
+  family = binomial()
+)
 
 
-
-
-  
-  
