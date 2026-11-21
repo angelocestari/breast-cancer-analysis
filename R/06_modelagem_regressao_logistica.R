@@ -253,4 +253,80 @@ resultado_drop1_5 <- drop1(
   test = "Chisq"
 )
 
-resultado_drop1_5
+resultado_drop1_5 # p-value > 0.05 e menor AIC -> remover
+
+dados_treino_vif_6 <- dados_treino_vif_5 |>
+  dplyr::select(-fractal_dimension_mean)
+
+modelo_vif_6 <- glm(
+  diagnosis ~ .,
+  data = dados_treino_vif_6,
+  family = binomial()
+)
+
+car::vif(modelo_vif_6)
+
+
+resultado_drop1_6 <- drop1(
+  modelo_vif_6,
+  test = "Chisq"
+)
+
+resultado_drop1_6
+
+dados_treino_vif_7 <- dados_treino_vif_6 |>
+  dplyr::select(-symmetry_mean)
+
+modelo_vif_7 <- glm(
+  diagnosis ~ .,
+  data = dados_treino_vif_7,
+  family = binomial()
+)
+
+car::vif(modelo_vif_7)
+
+
+resultado_drop1_7 <- drop1(
+  modelo_vif_7,
+  test = "Chisq"
+)
+
+resultado_drop1_7
+
+dados_treino_vif_8 <- dados_treino_vif_7 |>
+  dplyr::select(-compactness_worst)
+
+modelo_vif_8 <- glm(
+  diagnosis ~ .,
+  data = dados_treino_vif_8,
+  family = binomial()
+)
+
+car::vif(modelo_vif_8)
+
+
+resultado_drop1_8 <- drop1(
+  modelo_vif_8,
+  test = "Chisq"
+)
+
+resultado_drop1_8
+
+dados_treino_vif_9 <- dados_treino_vif_8 |>
+  dplyr::select(-symmetry_se)
+
+modelo_vif_9 <- glm(
+  diagnosis ~ .,
+  data = dados_treino_vif_9,
+  family = binomial()
+)
+
+car::vif(modelo_vif_9)
+
+
+resultado_drop1_9 <- drop1(
+  modelo_vif_9,
+  test = "Chisq"
+)
+
+resultado_drop1_9
