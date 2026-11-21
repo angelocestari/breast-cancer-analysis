@@ -335,3 +335,26 @@ saveRDS(
   modelo_vif_9,
   "results/modelo_logistico_final.rds"
 )
+
+saveRDS(
+  dados_teste,
+  "data/processed/dados_teste.rds"
+)
+
+saveRDS(
+  dados_treino,
+  "data/processed/dados_treino.rds"
+)
+
+variaveis_finais <- c(
+  "area_mean",
+  "radius_se",
+  "texture_se",
+  "texture_worst",
+  "symmetry_worst"
+)
+
+saveRDS(
+  variaveis_finais,
+  "results/variaveis_finais.rds"
+)
