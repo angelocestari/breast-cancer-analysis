@@ -1,6 +1,7 @@
 library(rsample)
 library(caret)
 library(car)
+library(detectseparation)
 
 dados_modelo <- readRDS(
   "data/processed/breast_cancer_processed.rds"
@@ -203,3 +204,53 @@ modelo_padronizado <- glm(
 )
 
 
+# ----------------------------------------------------
+# Estou com um warning sobre probabilidades extremas
+# ----------------------------------------------------
+
+diagnostico_separacao <- glm(
+  diagnosis ~ .,
+  data = dados_treino_padronizado,
+  family = binomial(),
+  method = detect_separation
+)
+
+diagnostico_separacao # Não estão divergindo para infinito, então tudo ok
+
+
+# ---------------------------------------
+# Análise da regressão logística
+# ---------------------------------------
+
+summary(modelo_vif_4) # significante: p-value < 0.05
+
+resultado_drop_1 <- drop1(
+  modelo_vif_4,
+  test = "Chisq"
+)
+
+resultado_drop_1 
+# Observar o p-value.
+# H0: retirar essa variável não piora significativamente o modelo (pode retirar)
+# H1: retirar essa varíavel piora significativamente o modelo (deve manter)
+
+# Vou remover "smoothness_se" pois não impactará
+
+dados_treino_vif_5 <- dados_treino_vif_4 |>
+  dplyr::select(-smoothness_se)
+
+modelo_vif_5 <- glm(
+  diagnosis ~ .,
+  data = dados_treino_vif_5,
+  family = binomial()
+)
+
+car::vif(modelo_vif_5)
+
+
+resultado_drop1_5 <- drop1(
+  modelo_vif_5,
+  test = "Chisq"
+)
+
+resultado_drop1_5
