@@ -330,3 +330,8 @@ resultado_drop1_9 <- drop1(
 )
 
 resultado_drop1_9
+
+saveRDS(
+  modelo_vif_9,
+  "results/modelo_logistico_final.rds"
+)
