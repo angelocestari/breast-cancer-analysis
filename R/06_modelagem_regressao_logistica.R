@@ -351,6 +351,7 @@ variaveis_finais <- c(
   "radius_se",
   "texture_se",
   "texture_worst",
+  "smoothness_worst",
   "symmetry_worst"
 )
 
