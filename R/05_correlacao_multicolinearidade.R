@@ -74,4 +74,46 @@ ggsave(
 )
 
 
+indices_correlacao_forte <- which(
+  abs(matriz_correlacao) >= 0.8 &
+    upper.tri(matriz_correlacao),
+  arr.ind = TRUE
+)
+
+tabela_correlacoes_fortes <- data.frame(
+  variavel_1 = rownames(matriz_correlacao)[
+    indices_correlacao_forte[,"row"]
+  ],
+  
+  variavel_2 = colnames(matriz_correlacao)[
+    indices_correlacao_forte[,"col"]
+  ],
+  
+  rho_spearman = matriz_correlacao[
+    indices_correlacao_forte
+  ]
+)
+
+tabela_correlacoes_fortes <- tabela_correlacoes_fortes |> 
+  dplyr::mutate(
+    correlacao_absoluta = abs(rho_spearman)
+  ) |>
+  dplyr::arrange(
+    dplyr::desc(correlacao_absoluta)
+  )
+
+
+frequencia_correlacoes <- dplyr::bind_rows(
+  tabela_correlacoes_fortes |> 
+    dplyr::select(variavel = variavel_1),
+  
+  tabela_correlacoes_fortes |> 
+    dplyr::select(variavel = variavel_2)
+) |> 
+  dplyr::count(
+    variavel,
+    sort = TRUE,
+    name = "numero_correlacoes_fortes"
+  )
+
 

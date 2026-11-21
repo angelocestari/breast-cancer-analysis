@@ -1,4 +1,10 @@
+
+dados_modelo <- readRDS(
+  "data/processed/breast_cancer_processed.rds"
+)
+
 analisar_normalidade <- function(nome_variavel){
+  
   
   caracteristica <- sub(
     "_(mean|se|worst)$",
